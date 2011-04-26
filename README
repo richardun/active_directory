@@ -1,6 +1,0 @@
-= Active Directory
-
-Ruby Integration with Microsoft's Active Directory system based on original code by Justin Mecham and James Hunt at http://rubyforge.org/projects/activedirectory
-
-See documentation on ActiveDirectory::Base for more information.
-

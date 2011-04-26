@@ -1,3 +1,4 @@
+require 'psych'
 
 begin
   require 'jeweler'

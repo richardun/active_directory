@@ -75,7 +75,7 @@ module ActiveDirectory
 		# called Marketting, this method would only return the Sales group.
 		#
 		def groups
-			@groups ||= memberOf.collect { |dn| Group.find_by_distinguishedName(dn) }
+			@groups ||= Group.find(:all, :distinguishedname => @entry.memberOf)
 		end
 
 		#
@@ -84,7 +84,7 @@ module ActiveDirectory
 		#
 		def direct_reports
 			return [] if @entry.directReports.nil?
-			@direct_reports ||= @entry.directReports.collect { |dn| User.find_by_distinguishedName(dn) }
+			@direct_reports ||= User.find(:all, @entry.directReports)
 		end
 
 		#

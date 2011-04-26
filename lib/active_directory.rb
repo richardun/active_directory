@@ -32,6 +32,10 @@ require 'active_directory/field_type/password.rb'
 require 'active_directory/field_type/binary.rb'
 require 'active_directory/field_type/date.rb'
 require 'active_directory/field_type/timestamp.rb'
+require 'active_directory/field_type/dn_array.rb'
+require 'active_directory/field_type/user_dn_array.rb'
+require 'active_directory/field_type/group_dn_array.rb'
+require 'active_directory/field_type/member_dn_array.rb'
 
 module ActiveDirectory
   
@@ -47,31 +51,35 @@ module ActiveDirectory
   @@special_fields = {
 
     #All objects in the AD
-    # :Base => {
-    #   :objectguid => :binary,
-    #   :whencreated => :date,
-    #   :whenchanged => :date
-    # },
+    :Base => {
+      :objectguid => :Binary,
+      :whencreated => :Date,
+      :whenchanged => :Date,
+      :memberof => :DnArray,
+    },
 
     #User objects
     :User => {
-      :objectguid => :binary,
-      :whencreated => :date,
-      :whenchanged => :date,
-      :objectsid => :binary,
-      :msexchmailboxguid => :binary,
-      :msexchmailboxsecuritydescriptor => :binary,
-      :lastlogontimestamp => :timestamp,
-      :pwdlastset => :timestamp,
-      :accountexpires => :timestamp
+      :objectguid => :Binary,
+      :whencreated => :Date,
+      :whenchanged => :Date,
+      :objectsid => :Binary,
+      :msexchmailboxguid => :Binary,
+      :msexchmailboxsecuritydescriptor => :Binary,
+      :lastlogontimestamp => :Timestamp,
+      :pwdlastset => :Timestamp,
+      :accountexpires => :Timestamp,
+      :memberof => :MemberDnArray,
     },
 
     #Group objects
     :Group => {
-      :objectguid => :binary,
-      :whencreated => :date,
-      :whenchanged => :date,
-      :objectsid => :binary,
+      :objectguid => :Binary,
+      :whencreated => :Date,
+      :whenchanged => :Date,
+      :objectsid => :Binary,
+      :memberof => :GroupDnArray,
+      :member => :MemberDnArray,
     },
   }
 end
