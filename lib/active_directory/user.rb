@@ -148,5 +148,13 @@ module ActiveDirectory
 		def unlock!
 			@@ldap.replace_attribute(distinguishedName, :lockoutTime, ['0'])
 		end
+		
+		#
+		# Locks this account.
+		#
+		def lock!
+		  lockedout_until = FieldType::Timestamp.encode(Time.now) + AD_LOCKOUT_DURATION
+		  @@ldap.replace_attribute(distinguishedName, :lockoutTime, [lockedout_until])
+		end
 	end
 end

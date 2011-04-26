@@ -31,6 +31,13 @@ module ActiveDirectory
 		#
 		NIL_FILTER = Net::LDAP::Filter.pres('cn')
 
+		#
+		# When locking out an account, use these values which do not usually
+		# change.  If the domain policy changes, change these values.
+		# 6000000000 = 10 minutes
+		AD_LOCKOUT_DURATION  = 6000000000
+		AD_LOCKOUT_THRESHOLD = 3
+
 		@@ldap = nil
 
 		#
