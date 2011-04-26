@@ -20,25 +20,20 @@
 
 module ActiveDirectory
 	module FieldType
-		class Timestamp
-			AD_DIVISOR = 10_000_000     #:nodoc:
-			AD_OFFSET  = 11_644_473_600 #:nodoc:
-
+		class UserDnArray
 			#
-			# Encodes a local Time object (or the number of seconds since January
-			# 1, 1970) into a timestamp that the Active Directory server can
-			# understand (number of 100 nanosecond time units since January 1, 1600)
+			# Encodes an array of objects into a list of dns
 			# 
-			def self.encode(local_time)
-				(local_time.to_i + AD_OFFSET) * AD_DIVISOR
+			def self.encode(obj_array)
+				obj_array.collect { |obj| obj.dn }
 			end
 
 			#
-			# Decodes an Active Directory timestamp (the number of 100 nanosecond time
-			# units since January 1, 1600) into a Ruby Time object.
+			# Decodes a list of DNs into the objects that they are
 			#
-			def self.decode(remote_time)
-				Time.at( (remote_time.to_i / AD_DIVISOR) - AD_OFFSET )
+			def self.decode(dn_array)
+				# How to do user or group?
+				User.find(:all, :distinguishedname => dn_array)
 			end
 		end
 	end

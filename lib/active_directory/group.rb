@@ -98,26 +98,13 @@ module ActiveDirectory
 		# belong to this Group, or any of its subgroups, are returned.
 		# 
 		def member_users(recursive = false)
-			return [] unless has_members?
-			if recursive
-				if @member_users_r.nil?
-					@member_users_r = []
-					@entry.member.each do |member_dn|
-						subuser = User.find_by_distinguishedName(member_dn)
-						if subuser
-							@member_users_r << subuser
-						else
-							subgroup = Group.find_by_distinguishedName(member_dn)
-							if subgroup
-								@member_users_r = @member_users_r.concat(subgroup.member_users(true))
-							end
-						end
-					end
-				end
-				return @member_users_r
-			else
-				@member_users_non_r ||= @entry.member.collect { |dn| User.find_by_distinguishedName(dn) }.delete_if { |u| u.nil? }
-			end
+                        @member_users = User.find(:all, :distinguishedname => @entry.member).delete_if { |u| u.nil? }
+                        if recursive then
+                          self.member_groups.each do |group|
+                            @member_users.concat(group.member_users(true))
+                          end
+                        end
+                        return @member_users
 		end
 
 		#
@@ -130,22 +117,13 @@ module ActiveDirectory
 		# belong to this Group, or any of its subgroups, are returned.
 		# 
 		def member_groups(recursive = false)
-			return [] unless has_members?
-			if recursive
-				if @member_groups_r.nil?
-					@member_groups_r = []
-					@entry.member.each do |member_dn|
-						subgroup = Group.find_by_distinguishedName(member_dn)
-						if subgroup
-							@member_groups_r << subgroup
-							@member_groups_r = @member_groups_r.concat(subgroup.member_groups(true))
-						end
-					end
-				end
-				return @member_groups_r
-			else
-				@member_groups_non_r ||= @entry.member.collect { |dn| Group.find_by_distinguishedName(dn) }.delete_if { |g| g.nil? }
-			end
+                        @member_groups ||= Group.find(:all, :distinguishedname => @entry.member).delete_if { |g| g.nil? }
+                        if recursive then
+                          self.member_groups.each do |group|
+                            @member_groups.concat(group.member_groups(true))
+                          end
+                        end
+                        return @member_groups
 		end
 
 		#
@@ -153,7 +131,7 @@ module ActiveDirectory
 		#
 		def groups
 			return [] if memberOf.nil?
-			@groups ||= memberOf.collect { |group_dn| Group.find_by_distinguishedName(group_dn) }
+			@groups ||= Group.find(:all, :distinguishedname => @entry.memberOf).delete_if { |g| g.nil? }
 		end
 	end
 end
