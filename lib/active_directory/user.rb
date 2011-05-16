@@ -117,7 +117,7 @@ module ActiveDirectory
     # Returns true if the user password is expired
     #
     def password_expired?
-      password_expires_at = FieldType::Timestamp.encode(@entry.pwdLastSet) + AD_PASSWORD_EXPIRATION_DURATION
+      password_expires_at = FieldType::Timestamp.encode(pwdLastSet) + AD_PASSWORD_EXPIRATION_DURATION
       now = FieldType::Timestamp.encode(Time.now)
       (password_expires_at < now)
     end
