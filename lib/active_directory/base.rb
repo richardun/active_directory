@@ -329,7 +329,7 @@ module ActiveDirectory
 				raise ArgumentError, "find: Wrong number of arguments (#{args.size} for #{attribute_spec.size})" unless args.size == attribute_spec.size
 				filters = {}
 				[attribute_spec,args].transpose.each { |pr| filters[pr[0]] = pr[1] }
-				find(find_spec, :filter => filters)
+				find(find_spec, filters)
 			else
 				super name.to_sym, args
 			end
