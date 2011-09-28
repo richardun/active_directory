@@ -250,7 +250,11 @@ module ActiveDirectory
             
             options[:filter].each do |key, value|
                 if key == :attributes || key == :select
-                    options[:attributes] = value
+                    if value.class==Array
+                        options[:attributes] = value
+                    else
+                        options[:attributes] << value
+                    end
                     options[:filter].delete(key)
                 end
             end
