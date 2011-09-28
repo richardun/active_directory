@@ -35,9 +35,9 @@ module ActiveDirectory
 		# When locking out an account, use these values which do not usually
 		# change.  If the domain policy changes, change these values.
 		# 6000000000 = 10 minutes
-    # 77_760_000_000_000 = 90 days
+        # 77_760_000_000_000 = 90 days
 		AD_LOCKOUT_DURATION  = 6_000_000_000
-    AD_PASSWORD_EXPIRATION_DURATION = 77_760_000_000_000
+        AD_PASSWORD_EXPIRATION_DURATION = 77_760_000_000_000
 		AD_LOCKOUT_THRESHOLD = 3
 
 		@@ldap = nil
@@ -244,8 +244,16 @@ module ActiveDirectory
 
 			options = {
 				:filter => (args[1].nil?) ? NIL_FILTER : args[1],
-				:in => ''
+				:in => '',
+                :attributes => Array.new
 			}
+            
+            options[:filter].each do |key, value|
+                if key == :attributes || key == :select
+                    options[:attributes] = value
+                    options[:filter].delete(key)
+                end
+            end
 
 			cached_results = find_cached_results(args[1])
 			return cached_results if cached_results or cached_results.nil?
@@ -272,37 +280,37 @@ module ActiveDirectory
 		# Returns false on failure, nil on wrong object type
 		#
 		def self.find_cached_results(filters)
-			return false unless cache?
+            return false unless cache?
 
-			#Check to see if we're only looking for :distinguishedname
-			return false unless filters.is_a? Hash and filters.keys == [:distinguishedname]
+            #Check to see if we're only looking for :distinguishedname
+            return false unless filters.is_a? Hash and filters.keys == [:distinguishedname]
 
-			#Find keys we're looking up
-			dns = filters[:distinguishedname]
+            #Find keys we're looking up
+            dns = filters[:distinguishedname]
 
 			if dns.kind_of? Array
-				result = []
+                result = []
 
 				dns.each do |dn| 
-					entry = @@cache[dn]
+                    entry = @@cache[dn]
 
-					#If the object isn't in the cache just run the query
-					return false if entry.nil?
+                    #If the object isn't in the cache just run the query
+                    return false if entry.nil?
 
-					#Only permit objects of the type we're looking for
-					result << entry if entry.kind_of? self
+                    #Only permit objects of the type we're looking for
+                    result << entry if entry.kind_of? self
 				end
 
-				return result
+                return result
 			else
-				return false unless @@cache.key? dns
-				return @@cache[dns] if @@cache[dns].is_a? self
-			end
-		end
+                return false unless @@cache.key? dns
+                return @@cache[dns] if @@cache[dns].is_a? self
+            end
+        end
 
 		def self.find_all(options)
 			results = []
-			ldap_objs = @@ldap.search(:filter => options[:filter], :base => options[:in]) || []
+			ldap_objs = @@ldap.search(:filter => options[:filter], :base => options[:in], :attributes => options[:attributes]) || []
 
 			ldap_objs.each do |entry|
 				ad_obj = new(entry)
@@ -314,12 +322,12 @@ module ActiveDirectory
 		end
 
 		def self.find_first(options)
-      ldap_result = @@ldap.search(:filter => options[:filter], :base => options[:in])
-      return nil if ldap_result.empty?
+            ldap_result = @@ldap.search(:filter => options[:filter], :base => options[:in], :attributes => options[:attributes])
+            return nil if ldap_result.empty?
 
-			ad_obj = new(ldap_result[0])
-			@@cache[ad_obj.dn] = ad_obj unless ad_obj.instance_of? Base
-			return ad_obj
+            ad_obj = new(ldap_result[0])
+            @@cache[ad_obj.dn] = ad_obj unless ad_obj.instance_of? Base
+            return ad_obj
 		end
 
 		def self.method_missing(name, *args) # :nodoc:
