@@ -111,18 +111,18 @@ module ActiveDirectory
 		#
 		def can_login?
 			!disabled? && !locked?
-    end
+        end
 
-    #
-    # Returns true if the user password is expired
-    #
-    def password_expired?
-      password_expires_at = FieldType::Timestamp.encode(pwdLastSet) + AD_PASSWORD_EXPIRATION_DURATION
-      now = FieldType::Timestamp.encode(Time.now)
-      (password_expires_at < now)
-    end
-
-    #
+        #
+        # Returns true if the user password is expired
+        #
+        def password_expired?
+            password_expires_at = FieldType::Timestamp.encode(pwdLastSet) + AD_PASSWORD_EXPIRATION_DURATION
+            now = FieldType::Timestamp.encode(Time.now)
+            (password_expires_at < now)
+        end
+    
+        #
 		# Change the password for this account.
 		#
 		# This operation requires that the bind user specified in
