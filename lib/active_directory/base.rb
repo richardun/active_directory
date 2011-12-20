@@ -243,21 +243,25 @@ module ActiveDirectory
 			return false unless connected?
 
 			options = {
-				:filter => (args[1].nil?) ? NIL_FILTER : args[1],
+				:filter => NIL_FILTER,
 				:in => '',
                 :attributes => Array.new
 			}
-            
-            options[:filter].each do |key, value|
-                if key == :attributes || key == :select
-                    if value.class==Array
-                        options[:attributes] = value
+          
+            unless args[1].nil?
+                options[:filter] = Hash.new
+                args[1].each do |key, value|
+                    if key == :attributes || key == :select
+                        if value.class==Array
+                            options[:attributes] = value
+                        else
+                            options[:attributes] << value
+                        end
                     else
-                        options[:attributes] << value
+                        options[:filter] << { key => value }
                     end
-                    options[:filter].delete(key)
                 end
-            end
+            end 
 
 			cached_results = find_cached_results(args[1])
 			return cached_results if cached_results or cached_results.nil?
