@@ -258,7 +258,7 @@ module ActiveDirectory
                             options[:attributes] << value
                         end
                     else
-                        options[:filter] << { key => value }
+                        options[:filter][key] = value
                     end
                 end
             end 
