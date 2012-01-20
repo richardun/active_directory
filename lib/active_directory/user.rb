@@ -83,8 +83,9 @@ module ActiveDirectory
 		# User as their manager.
 		#
 		def direct_reports
-			return [] if @entry.directReports.nil?
-			@direct_reports ||= User.find(:all, @entry.directReports)
+			return [] if @entry["directReports"].blank?
+			#@direct_reports ||= User.find(:all, @entry.directReports)
+            @direct_reports ||= @entry.directReports.collect { |dn| User.find_by_distinguishedName(dn) }
 		end
 
 		#
