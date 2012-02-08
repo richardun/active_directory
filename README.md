@@ -19,7 +19,7 @@ Run bundle install: <em> :; is my prompt </em>
 :; bundle install
 </pre>
 
-----[ Base setup ]----
+<h3>Base setup</h3>
 You can do this next part however you like, but I put the settings global variable in ../config/initializers/ad.rb...
 <pre>
 # Uses the same settings as net/ldap
@@ -36,13 +36,13 @@ AD_SETTINGS = {
 }
 </pre>
 
-----[ Simple finds using attributes ]----
+<h3>Simple finds using attributes</h3>
 Then I put the base initialization in ../app/controllers/application_controller.rb...
 <pre>
 ActiveDirectory::Base.setup(settings)
 </pre>
 
-Then in my model, or anywhere really, I can look for AD users, etc.
+<p>Then in my model, or anywhere really, I can look for AD users, etc.</p>
 
 <pre>
 ActiveDirectory::User.find(:all)
@@ -56,10 +56,10 @@ ActiveDirectory::Base.disable_cache
 ActiveDirectory::Base.cache?
 </pre>
 
-----[ ActiveRecord example ]----
-You can also limit the fields that get returned, just like with ActiveRecord.
+<h3>ActiveRecord example</h3>
+<p>You can also limit the fields that get returned, just like with ActiveRecord.</p>
 
-In ActiveRecord, you use ":select => ['select this', 'or', 'that']" - you can do this or use the net/ldap syntax of ":attributes => ..."  You should use one or the other, but not both.
+<p>In ActiveRecord, you use ":select => ['select this', 'or', 'that']" - you can do this or use the net/ldap syntax of ":attributes => ..."  You should use one or the other, but not both.</p>
 
 <pre>
 ad_user = ActiveDirectory::User.find(:all, :attributes => ['givenname', 'sn'])
@@ -75,10 +75,10 @@ puts ad_user.name #=> Richard Navarrete
 puts ad_user.mail #=> ArgumentError: no id given
 </pre>
 
-----[ Net::LDAP::Filter ]----
-You can pass any filter you can make in Net::LDAP::Filter along in the find.
-In this example, I have a couple of groups that a given user can be a member of.
-If they are a member of either of the groups (memberOf) then a user will be returned.
+<h3>Net::LDAP::Filter</h3>
+You can pass any filter you can make in Net::LDAP::Filter along in the find.<br />
+In this example, I have a couple of groups that a given user can be a member of.<br />
+If they are a member of either of the groups (memberOf) then a user will be returned.<br />
 
 <pre>
 groups = ['CN=admins,OU=Security,OU=Groups,DC=Example,DC=Local', 'CN=HR,OU=Security,OU=Groups,DC=Example,DC=Local']
