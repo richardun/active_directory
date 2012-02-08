@@ -19,6 +19,7 @@ Run bundle install: <em> :; is my prompt </em>
 :; bundle install
 </pre>
 
+----[ Base setup ]----
 You can do this next part however you like, but I put the settings global variable in ../config/initializers/ad.rb...
 <pre>
 # Uses the same settings as net/ldap
@@ -35,6 +36,7 @@ AD_SETTINGS = {
 }
 </pre>
 
+----[ Simple finds using attributes ]----
 Then I put the base initialization in ../app/controllers/application_controller.rb...
 <pre>
 ActiveDirectory::Base.setup(settings)
@@ -54,6 +56,7 @@ ActiveDirectory::Base.disable_cache
 ActiveDirectory::Base.cache?
 </pre>
 
+----[ ActiveRecord example ]----
 You can also limit the fields that get returned, just like with ActiveRecord.
 
 In ActiveRecord, you use ":select => ['select this', 'or', 'that']" - you can do this or use the net/ldap syntax of ":attributes => ..."  You should use one or the other, but not both.
@@ -70,4 +73,40 @@ puts ad_user.name #=> Richard Navarrete
 
 # But looking for a field you didn't return will raise an ArgumentError.
 puts ad_user.mail #=> ArgumentError: no id given
+</pre>
+
+----[ Net::LDAP::Filter ]----
+You can pass any filter you can make in Net::LDAP::Filter along in the find.
+In this example, I have a couple of groups that a given user can be a member of.
+If they are a member of either of the groups (memberOf) then a user will be returned.
+
+<pre>
+groups = ['CN=admins,OU=Security,OU=Groups,DC=Example,DC=Local', 'CN=HR,OU=Security,OU=Groups,DC=Example,DC=Local']
+
+# Don't miss this important step -> be sure to put double quotes in the value, no matter if it's a
+# single variable string that you're interpolating... it must be there or Net::LDAP::Filter will
+# treat it like an Array and won't find gsub and error out!
+filter = Net::LDAP::Filter.eq('distinguishedName', "#{session[:current_user][:dn]}")
+
+
+# Same thing here with the memberOf equals... must have double quotes!
+# Notice the |= under else, this will make the groups all OR conditions.
+# Obviously replace this with &= if you require that the give user be 
+# a member of ALL the given groups. 
+right_filter = nil
+groups.each do |group|
+    if right_filter.nil?
+        right_filter = Net::LDAP::Filter.eq('memberOf', "#{group}")
+    else
+        right_filter |= Net::LDAP::Filter.eq('memberOf', "#{group}")
+    end
+end
+
+filter = filter & (right_filter)
+
+# Assuming you already setup the Base, but just in case...
+ActiveDirectory::Base.setup(AD_SETTINGS)
+
+ad_user = ActiveDirectory::User.find(:all, filter)
+
 </pre>
