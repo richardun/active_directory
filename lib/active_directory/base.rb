@@ -562,7 +562,7 @@ module ActiveDirectory
         def get_attr(name)
             name = name.to_s.downcase
 
-            return decode_field(name, @attributes[name.to_sym]) if @attributes.has_key?(name.to_sym)
+            return self.class.decode_field(name, @attributes[name.to_sym]) if @attributes.has_key?(name.to_sym)
                 
             if @entry.attribute_names.include? name.to_sym
                 value = @entry[name.to_sym]
