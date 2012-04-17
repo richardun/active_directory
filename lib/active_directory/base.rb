@@ -404,9 +404,7 @@ module ActiveDirectory
 
             operations = []
             attributes_to_update.each do |attribute, values|
-                if values.nil? || values.empty?
-                    operations << [ :delete, attribute, nil ]
-                else
+                if values.present?
                     values = [values] unless values.is_a? Array
                     values = values.collect { |v| v.to_s }
 
@@ -417,6 +415,8 @@ module ActiveDirectory
                     end
 
                     operations << [ (current_value.nil? ? :add : :replace), attribute, values ]
+                else
+                    operations << [ :delete, attribute, nil ]
                 end
             end
 
