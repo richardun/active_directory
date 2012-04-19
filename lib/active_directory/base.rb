@@ -574,7 +574,7 @@ module ActiveDirectory
         end
 
         def set_attr(name, value)
-            @attributes[name.to_sym] = encode_field(name, value)
+            @attributes[name.to_sym] = self.class.encode_field(name, value)
         end
 
         ##
