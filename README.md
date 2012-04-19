@@ -1,3 +1,5 @@
+*** Coming Soon:  I'm reworking this gem to allow simulatneous and multiple connections. Also, I'll be adding RSpec test units for all the methods.  Stay tuned!***
+
 = Active Directory
 
 Ruby Integration with Microsoft's Active Directory system based on original code by Justin Mecham and James Hunt at http://rubyforge.org/projects/activedirectory
@@ -109,4 +111,37 @@ ActiveDirectory::Base.setup(AD_SETTINGS)
 
 ad_user = ActiveDirectory::User.find(:all, filter)
 
+</pre>
+
+<h3>Updating thumbnailPhoto attribute in AD!</h3>
+Here is something I included in a user model (with email as an attribute), to update the coorsponding AD account with a thumbnailPhoto.
+Use AD gem's "update_attribute."
+<pre>
+def update_ad_profile_pic
+    begin
+        ad_user = ActiveDirectory::User.find(:first, :mail => self.email)
+        if ad_user.present?
+            picture_data = image_to_bytes
+            ad_user.update_attribute(:thumbnailPhoto, picture_data)
+        else
+            false
+        end
+    rescue Exception => e
+        logger.error("** Failed updating AD photo for: #{self.email} \n#{e.message}")
+    end
+end
+
+private
+
+# convert this user's "image_tiny" byte-by-byte and return
+# using Dragonfly here for the image, but you can use anything... it's just an image
+def image_to_bytes
+    picture_data = ""
+    file = File.open("#{Rails.root}/public/#{self.image_tiny.remote_url}",'rb')
+    file.read.each_byte do |byte|
+        picture_data << byte
+    end
+    file.close
+    picture_data
+end
 </pre>
