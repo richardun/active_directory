@@ -114,6 +114,7 @@ ad_user = ActiveDirectory::User.find(:all, filter)
 </pre>
 
 <h3>Updating thumbnailPhoto attribute in AD!</h3>
+First, why would you want to do this?  I did it so that users could upload a photo in one place, and it would update other applications with user avatars where it was more convenient instead of making those applications point to a URL.  Basically, if you update thumbnailPhoto with an image, the user pic will show up for users in MS Outlook, MS Lync, etc.
 Here is something I included in a user model (with email as an attribute), to update the coorsponding AD account with a thumbnailPhoto.
 Use AD gem's "update_attribute."
 <pre>
