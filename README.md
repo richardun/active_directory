@@ -27,9 +27,9 @@ In Gemfile:
 gem 'active_directory', :git => 'git://github.com/richardun/active_directory.git'
 ```
 
-Run bundle install: <em> :; is my prompt </em>
+Run bundle install:
 ```bash
-> bundle install
+$ bundle install
 ```
 
 
