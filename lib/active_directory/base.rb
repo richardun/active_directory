@@ -1,3 +1,5 @@
+require 'active_support/core_ext/object/blank'
+
 #-- license
 #
 #  Based on original code by Justin Mecham and James Hunt

@@ -17,5 +17,6 @@ Gem::Specification.new do |gem|
   gem.require_paths = ['lib']
   gem.version       = ActiveDirectory::VERSION
   
+  gem.add_runtime_dependency 'activesupport', '~> 3.0'
   gem.add_runtime_dependency 'net-ldap', '>= 0.1.1'
 end
