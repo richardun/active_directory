@@ -122,7 +122,7 @@ module ActiveDirectory
             now = FieldType::Timestamp.encode(Time.now)
             (password_expires_at < now)
         end
-    
+
         #
 		# Change the password for this account.
 		#
@@ -146,7 +146,6 @@ module ActiveDirectory
 				:operations => [
 					[ :replace, :lockoutTime, [ '0' ] ],
 					[ :replace, :unicodePwd, [ FieldType::Password.encode(new_password) ] ],
-					[ :replace, :userAccountControl, [ UAC_NORMAL_ACCOUNT.to_s ] ],
 					[ :replace, :pwdLastSet, [ (force_change ? '0' : '-1') ] ]
 				]
 			)
@@ -158,7 +157,7 @@ module ActiveDirectory
 		def unlock!
 			@@ldap.replace_attribute(distinguishedName, :lockoutTime, ['0'])
 		end
-		
+
 		#
 		# Locks this account.
 		#
