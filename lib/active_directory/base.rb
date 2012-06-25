@@ -244,7 +244,7 @@ module ActiveDirectory
 
             options[:filter]     = given_filter.blank? ? NIL_FILTER : given_filter
             options[:attributes] = Array.new
-            options[:in]         = ''
+            options[:in]       ||= ''
             options[:scope]    ||= Net::LDAP::SearchScope_WholeSubtree
 
             if options[:filter].is_a? Hash
