@@ -121,7 +121,7 @@ module ActiveDirectory
 
         ##
         # Enable caching for queries against the DN only
-        # This is to prevent membership lookups from hitting the 
+        # This is to prevent membership lookups from hitting the
         # AD unnecessarilly
         def self.enable_cache
             @@caching = true
@@ -134,7 +134,7 @@ module ActiveDirectory
         end
 
         def self.filter # :nodoc:
-            NIL_FILTER 
+            NIL_FILTER
         end
 
         def self.required_attributes # :nodoc:
@@ -144,7 +144,7 @@ module ActiveDirectory
         #
         # Check to see if any entries matching the passed criteria exists.
         #
-        # Filters should be passed as a hash of 
+        # Filters should be passed as a hash of
         # attribute_name => expected_value, like:
         #
         #   User.exists?(
@@ -169,7 +169,7 @@ module ActiveDirectory
         # Note that the * wildcard matches zero or more characters,
         # so the above query would also return true if a group named
         # 'OldGroup_' exists.
-        # 
+        #
         def self.exists?(filter_as_hash)
             criteria = make_filter_from_hash(filter_as_hash) & filter
             (@@ldap.search(:filter => criteria).size > 0)
@@ -239,40 +239,41 @@ module ActiveDirectory
         # (a User or a Group) back, or nil, if there were no entries
         # matching your filter.
         #
-        def self.find(*args)
+        def self.find(all_or_first, given_filter=nil, options={})
             return false unless connected?
 
-            options = {
-                :filter => (args[1].blank?) ? NIL_FILTER : args[1],
-                :in => '',
-                :attributes => Array.new
-            }
+            options[:filter]     = given_filter.blank? ? NIL_FILTER : given_filter
+            options[:attributes] = Array.new
+            options[:in]         = ''
+            options[:scope]    ||= Net::LDAP::SearchScope_WholeSubtree
 
-            options[:filter].each do |key, value|
+            if options[:filter].is_a? Hash
+              options[:filter].each do |key, value|
                 if key == :attributes || key == :select
-                    if value.class==Array
-                        options[:attributes] = value
-                    else
-                        options[:attributes] << value
-                    end
-                    options[:filter].delete(key)
+                  if value.class==Array
+                    options[:attributes] = value
+                  else
+                    options[:attributes] << value
+                  end
+                  options[:filter].delete(key)
                 end
-            end if options[:filter].is_a? Hash
+              end
+            end
 
-            cached_results = find_cached_results(args[1])
+            cached_results = find_cached_results(given_filter)
             return cached_results if cached_results or cached_results.nil?
 
             options[:in] = [ options[:in].to_s, @@settings[:base] ].delete_if { |part| part.empty? }.join(",")
 
             if options[:filter].is_a? Hash
-                options[:filter] = make_filter_from_hash(options[:filter])
+              options[:filter] = make_filter_from_hash(options[:filter])
             end
 
             options[:filter] = options[:filter] & filter unless self.filter == NIL_FILTER
 
-            if (args.first == :all)
+            if (all_or_first == :all)
                 find_all(options)
-            elsif (args.first == :first)
+            elsif (all_or_first == :first)
                 find_first(options)
             else
                 raise ArgumentError, 'Invalid specifier (not :all, and not :first) passed to find()'
@@ -295,7 +296,7 @@ module ActiveDirectory
             if dns.kind_of? Array
                 result = []
 
-                dns.each do |dn| 
+                dns.each do |dn|
                     entry = @@cache[dn]
 
                     #If the object isn't in the cache just run the query
@@ -314,11 +315,11 @@ module ActiveDirectory
 
         def self.find_all(options)
             results = []
-            ldap_objs = @@ldap.search(:filter => options[:filter], :base => options[:in], :attributes => options[:attributes]) || []
+            ldap_objs = @@ldap.search(:filter => options[:filter], :base => options[:in], :attributes => options[:attributes], :scope => options[:scope]) || []
 
             ldap_objs.each do |entry|
                 ad_obj = new(entry)
-                @@cache[entry.dn] = ad_obj unless ad_obj.instance_of? Base 
+                @@cache[entry.dn] = ad_obj unless ad_obj.instance_of? Base
                 results << ad_obj
             end
 
@@ -326,7 +327,7 @@ module ActiveDirectory
         end
 
         def self.find_first(options)
-            ldap_result = @@ldap.search(:filter => options[:filter], :base => options[:in], :attributes => options[:attributes])
+            ldap_result = @@ldap.search(:filter => options[:filter], :base => options[:in], :attributes => options[:attributes], :scope => options[:scope])
             return nil if ldap_result.empty?
 
             ad_obj = new(ldap_result[0])
@@ -527,8 +528,8 @@ module ActiveDirectory
             @klass ||= (self.name.include?('::') ? self.name[/.*::(.*)/, 1] : self.name)
         end
 
-        ## 
-        # Grabs the field type depending on the class it is called from 
+        ##
+        # Grabs the field type depending on the class it is called from
         # Takes the field name as a parameter
         def self.get_field_type(name)
             #Extract class name
@@ -563,7 +564,7 @@ module ActiveDirectory
             name = name.to_s.downcase
 
             return self.class.decode_field(name, @attributes[name.to_sym]) if @attributes.has_key?(name.to_sym)
-                
+
             if @entry.attribute_names.include? name.to_sym
                 value = @entry[name.to_sym]
                 value = value.first if value.kind_of?(Array) && value.size == 1
