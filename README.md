@@ -1,4 +1,4 @@
-*** Coming Soon:  I'm reworking this gem to allow simulatneous and multiple connections. Also, I'll be adding RSpec test units for all the methods.  Stay tuned!***
+*** Well, I was full of hope to modify this code and bring it up to speed with the latest Rails 4+ and Active Directory, etc.... but too many other projects got in the way. Perhaps some day.***
 
 = Active Directory
 
