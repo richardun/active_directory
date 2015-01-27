@@ -1,5 +1,3 @@
-*** Well, I was full of hope to modify this code and bring it up to speed with the latest Rails 4+ and Active Directory, etc.... but too many other projects got in the way. Perhaps some day.***
-
 = Active Directory
 
 Ruby Integration with Microsoft's Active Directory system based on original code by Justin Mecham and James Hunt at http://rubyforge.org/projects/activedirectory
@@ -13,8 +11,11 @@ Queries for membership and group membership are based on the distinguished name 
 <h3>INSTALL (with Bundler for instance)</h3>
 In Gemfile:
 <pre>
+gem 'net-ldap', :git => 'git://github.com/ruby-ldap/ruby-net-ldap.git'
 gem 'active_directory', :git => 'git://github.com/richardun/active_directory.git'
 </pre>
+
+Note: You'll need to install ruby-net-ldap from GitHub until the maintainer pushes version 0.5.0 or later to rubygems.org.
 
 Run bundle install: <em> :; is my prompt </em>
 <pre>
